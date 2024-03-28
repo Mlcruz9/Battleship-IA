@@ -34,31 +34,33 @@ def grid_make(left = 40, top = 40):
             pygame.draw.rect(SCREEN, WHITE, square, width=3) #Draw the square (1 of 100)
 
 #Draw the ships
-def draw_ships(player, left = 40, top = 40): #Player is an object of the class Player, ecach player has 10 ships
+def draw_ships(player, left = 40, top = 40):
     for ship in player.ships:
-        for i, j in ship: #i is the row, j is the column of each ship
-            pygame.draw.rect(SCREEN, GREEN, (5 + left + (i * ((WIDTH - H_MARGIN)//20)), \
-                                    5 + top + (j * ((HEIGHT - V_MARGIN)//20)),\
-                                        (WIDTH - H_MARGIN)//20 -10, (HEIGHT - V_MARGIN)//20 - 10), border_radius= 20) #Draw the ship
-            pygame.draw.rect(SCREEN, BLACK, (left + (i * ((WIDTH - H_MARGIN)//20)), \
-                                    top + (j * ((HEIGHT - V_MARGIN)//20)),\
-                                        (WIDTH - H_MARGIN)//20, (HEIGHT - V_MARGIN)//20), width=1) #Draw the square of the ship
+        for i, j in ship:  # i es la fila, j es la columna de cada barco
+            pygame.draw.rect(SCREEN, GREEN, (5 + left + (j * ((WIDTH - H_MARGIN)//20)),  # Usar j para calcular x
+                                             5 + top + (i * ((HEIGHT - V_MARGIN)//20)),  # Usar i para calcular y
+                                             (WIDTH - H_MARGIN)//20 - 10, (HEIGHT - V_MARGIN)//20 - 10), border_radius=20)
+            pygame.draw.rect(SCREEN, BLACK, (left + (j * ((WIDTH - H_MARGIN)//20)),  # Usar j para calcular x
+                                             top + (i * ((HEIGHT - V_MARGIN)//20)),  # Usar i para calcular y
+                                             (WIDTH - H_MARGIN)//20, (HEIGHT - V_MARGIN)//20), width=1)
 
 #Draw shots that hit the ships
 def draw_removed_positions(game_shots, left, top):
     for i, j in game_shots:
         # Draw a different color or indicator for removed positions
-        pygame.draw.rect(SCREEN, RED, (5 + left + (i * ((WIDTH - H_MARGIN)//20)), \
-                                    5 + top + (j * ((HEIGHT - V_MARGIN)//20)),\
-                                        (WIDTH - H_MARGIN)//20 -10, (HEIGHT - V_MARGIN)//20 - 10))
+        pygame.draw.rect(SCREEN, RED, (5 + left + (j * ((WIDTH - H_MARGIN)//20)),  # Usar j para calcular la posición x
+                                       5 + top + (i * ((HEIGHT - V_MARGIN)//20)),  # Usar i para calcular la posición y
+                                       (WIDTH - H_MARGIN)//20 - 10, (HEIGHT - V_MARGIN)//20 - 10))
+
         
 #Draw shots that missed the ships
 def draw_shots(game_shots, left, top):
     for i, j in game_shots:
-        # Draw a different color or indicator for removed positions
-        pygame.draw.rect(SCREEN, BLUE, (5 + left + (i * ((WIDTH - H_MARGIN)//20)), \
-                                    5 + top + (j * ((HEIGHT - V_MARGIN)//20)),\
-                                        (WIDTH - H_MARGIN)//20 -10, (HEIGHT - V_MARGIN)//20 - 10))
+        # Dibuja un color diferente o indicador para las posiciones de disparos
+        pygame.draw.rect(SCREEN, BLUE, (5 + left + (j * ((WIDTH - H_MARGIN) // 20)),  # Usar j para calcular la posición x
+                                        5 + top + (i * ((HEIGHT - V_MARGIN) // 20)),  # Usar i para calcular la posición y
+                                        (WIDTH - H_MARGIN) // 20 - 10, (HEIGHT - V_MARGIN) // 20 - 10))
+
 
 #Loop of the game
 animating = True
@@ -104,17 +106,50 @@ while animating:
 
             
         #Playing the game
-        if not pausing:
-            message = Game_battleship.make_move(np.random.randint(10), np.random.randint(10)) #Play game
-            draw_removed_positions(game_shots = Game_battleship.player_1_removed_positions, left = 40, top = 40)
-            draw_removed_positions(game_shots = Game_battleship.player_2_removed_positions, left = WIDTH//2 + 60, top = HEIGHT//2 + 25)
+        if not pausing and not Game_battleship.over:
+
+            print('Player 1 board: \n', Game_battleship.player_1.board)
+            print('Player 1 ships: \n', Game_battleship.player_1.ships)
+            print('Player 1 removed positions: \n', Game_battleship.player_1_removed_positions)
+
+            print('Player 2 board: \n', Game_battleship.player_2.board)
+            print('Player 2 ships: \n', Game_battleship.player_2.ships)
+            print('Player 2 removed positions: \n', Game_battleship.player_2_removed_positions)
+           
+
+            message = Game_battleship.make_move() #Play game
+            draw_removed_positions(game_shots = Game_battleship.player_2_removed_positions, left = 40, top = 40)
+            draw_removed_positions(game_shots = Game_battleship.player_1_removed_positions, left = WIDTH//2 + 60, top = HEIGHT//2 + 25)
             draw_shots(game_shots = Game_battleship.player_1_shots, left = 40, top = 40)
             draw_shots(game_shots = Game_battleship.player_2_shots, left = WIDTH//2 + 60, top = HEIGHT//2 + 25)
             
+            
+            
 
             pygame.display.flip()
-            clock.tick(50)
+        
+       
+        if Game_battleship.over:
+            print('Game over')
+            #keep the window open but pause the game
+            pausing = True
 
+            #Draw the winner
+            font = pygame.font.Font(None, 74)
+
+            if Game_battleship.player_1.ships == []:
+                print('Player 2 wins')
+                text = font.render('Player 2 wins', True, WHITE)
+            else:
+                print('Player 1 wins')
+                text = font.render('Player 1 wins', True, WHITE)
+                
+
+            text_rect = text.get_rect(center=(WIDTH//2, HEIGHT//2))
+            SCREEN.blit(text, text_rect)
+            pygame.display.flip()
+            pygame.time.wait(3000)
+            animating = False
             
 
             
