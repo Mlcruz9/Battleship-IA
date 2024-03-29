@@ -65,7 +65,7 @@ def draw_shots(game_shots, left, top):
 #Loop of the game
 animating = True
 pausing = False
-Game_battleship = Game() #Create an object of the class Game
+Game_battleship = Game(AI=True) #Create an object of the class Game
 
 #Grids
 SCREEN.fill(GREY)
@@ -120,12 +120,12 @@ while animating:
             message = Game_battleship.make_move() #Play game
             draw_removed_positions(game_shots = Game_battleship.player_2_removed_positions, left = 40, top = 40)
             draw_removed_positions(game_shots = Game_battleship.player_1_removed_positions, left = WIDTH//2 + 60, top = HEIGHT//2 + 25)
-            draw_shots(game_shots = Game_battleship.player_1_shots, left = 40, top = 40)
-            draw_shots(game_shots = Game_battleship.player_2_shots, left = WIDTH//2 + 60, top = HEIGHT//2 + 25)
+            draw_shots(game_shots = Game_battleship.player_1_missed_shots, left = 40, top = 40)
+            draw_shots(game_shots = Game_battleship.player_2_missed_shots, left = WIDTH//2 + 60, top = HEIGHT//2 + 25)
             
             
             
-
+            clock.tick(1000000)
             pygame.display.flip()
         
        
