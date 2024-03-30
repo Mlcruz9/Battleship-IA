@@ -124,28 +124,28 @@ class MonteCarloPlayer(Player):
             placed = False
             attempts = 0
             while not placed and attempts < 100:
-                ship = Ship(size)
-                if self.can_place_ship(ship.indexes, size):
-                    self.ships.append(ship.indexes)
+                ship = Ship(size)  # Crea una nueva instancia de Ship con un tamaño específico.
+                if self.can_place_simulated_ship(ship.indexes, size):
+                    # En lugar de añadir a self.ships, marca las posiciones en self.simulated_board.
                     for (i, j) in ship.indexes:
-                        self.simulated_board[i, j] = 'S'
+                        self.simulated_board[i, j] = 'S'  # Marca como 'S' en el tablero simulado.
                     placed = True
                 attempts += 1
 
-    def can_place_ship(self, ship_indexes, size):
+    def can_place_simulated_ship(self, ship_indexes, size):
         for (i, j) in ship_indexes:
             if self.simulated_board[i, j] in ['M', 'S']:
                 return False
-            if not (0 <= i < 10 and 0 <= j < 10) or self.is_near_other_ship(i, j):
+            if not (0 <= i < 10 and 0 <= j < 10) or self.is_near_other_simulated_ship(i, j):
                 return False
         return True
 
-    def is_near_other_ship(self, i, j):
+    def is_near_other_simulated_ship(self, i, j):
         checks = [(i-1, j-1), (i-1, j), (i-1, j+1),
-                (i, j-1),(i, j+1),
+                (i, j-1), (i, j+1),
                 (i+1, j-1), (i+1, j), (i+1, j+1)]
         for x, y in checks:
-            if 0 <= x < 10 and 0 <= y < 10 and (self.simulated_board[x, y] == 'S' or self.simulated_board[x, y] == 'H'):
+            if 0 <= x < 10 and 0 <= y < 10 and self.simulated_board[x, y] == 'S':
                 return True
         return False
     
@@ -188,23 +188,32 @@ class MonteCarloPlayer(Player):
                 coords_hits[coords] += hits
         
         # Encontrar las coordenadas con el máximo número de aciertos
-        max_hits = max(coords_hits.values())
-        best_coords = [coords for coords, hits in coords_hits.items() if hits == max_hits]
+        if len(coords_hits) > 5:
+
+            try:
+                max_hits = max(coords_hits.values())
+                best_coords = [coords for coords, hits in coords_hits.items() if hits == max_hits]
+                # Elegir aleatoriamente entre las mejores coordenadas si hay empates
+                # Convertir la lista de tuplas a un array de objetos para manejarlo con NumPy
+                best_coords = np.array(best_coords, dtype=object)
+
+                # Seleccionar un índice al azar
+                indice_aleatorio = np.random.choice(len(best_coords))
+
+                # Usar el índice para seleccionar la tupla
+                tupla_seleccionada = best_coords[indice_aleatorio]
+                return tupla_seleccionada
+            
+            except:
+                # No se encontraron hits en ninguna simulación
+                return np.random.randint(10), np.random.randint(10)
+        else:
+            # No se encontraron hits en ninguna simulación
+            return np.random.randint(10), np.random.randint(10)
         
-        # Elegir aleatoriamente entre las mejores coordenadas si hay empates
-        # Convertir la lista de tuplas a un array de objetos para manejarlo con NumPy
-        best_coords = np.array(best_coords, dtype=object)
-
-        # Seleccionar un índice al azar
-        indice_aleatorio = np.random.choice(len(best_coords))
-
-        # Usar el índice para seleccionar la tupla
-        tupla_seleccionada = best_coords[indice_aleatorio]
-        return tupla_seleccionada
-    
-    def determine_best_move(self):
+    def determine_best_move(self, simulations=100, shots_per_simulation=100):
         """Determina el mejor movimiento basado en múltiples simulaciones."""
-        best_move = self.multiple_board_simulations(1000, 100)
+        best_move = self.multiple_board_simulations(simulations, shots_per_simulation)
         return best_move
 
 class Game:
@@ -238,6 +247,7 @@ class Game:
         else:
             row = np.random.randint(10)
             col = np.random.randint(10)
+            print(f"Random shot at {row, col}")
             
         if (row, col) not in removed_positions and (row, col) not in players_missed_shots: #If the position is not in the removed positions and not in the shots
 
@@ -255,8 +265,11 @@ class Game:
                     return "H"  # Ship is hit but not sunk
 
             # If it's not a hit, handle miss or invalid shot
-            # if ((row, col) not in players_shots) and ((row, col) not in removed_positions): #If the position is not in the shots and not in the removed positions
-            players_missed_shots.append((row, col)) #Append the position to the shots
-            player.update_board(row, col, "M") #Update the board of the player with a miss
-            self.player_1_turn = not self.player_1_turn #Change the turn
-            return "M"  # Miss
+            if ((row, col) not in players_missed_shots) and ((row, col) not in removed_positions): #If the position is not in the shots and not in the removed positions
+                players_missed_shots.append((row, col)) #Append the position to the shots
+                player.update_board(row, col, "M") #Update the board of the player with a miss
+                self.player_1_turn = not self.player_1_turn #Change the turn
+                return "M"  # Miss
+            
+            else:
+                return "Move already made" #If the move is already made

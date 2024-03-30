@@ -107,23 +107,13 @@ while animating:
             
         #Playing the game
         if not pausing and not Game_battleship.over:
-
-            print('Player 1 board: \n', Game_battleship.player_1.board)
-            print('Player 1 ships: \n', Game_battleship.player_1.ships)
-            print('Player 1 removed positions: \n', Game_battleship.player_1_removed_positions)
-
-            print('Player 2 board: \n', Game_battleship.player_2.board)
-            print('Player 2 ships: \n', Game_battleship.player_2.ships)
-            print('Player 2 removed positions: \n', Game_battleship.player_2_removed_positions)
            
-
             message = Game_battleship.make_move() #Play game
             draw_removed_positions(game_shots = Game_battleship.player_2_removed_positions, left = 40, top = 40)
             draw_removed_positions(game_shots = Game_battleship.player_1_removed_positions, left = WIDTH//2 + 60, top = HEIGHT//2 + 25)
             draw_shots(game_shots = Game_battleship.player_1_missed_shots, left = 40, top = 40)
             draw_shots(game_shots = Game_battleship.player_2_missed_shots, left = WIDTH//2 + 60, top = HEIGHT//2 + 25)
-            
-            
+        
             
             clock.tick(1000000)
             pygame.display.flip()
