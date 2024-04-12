@@ -88,10 +88,12 @@ class MonteCarloPlayer(Player):
 
     '''This is a class for a Monte Carlo player, it inherits from the class Player'''
 
-    def __init__(self):
+    def __init__(self, board_simulations, shots_per_simulation):
         super().__init__() #Inherits from the class Player
         self.ship_sizes = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1]
         self.simulated_board = self.board.copy() #Copy of the board
+        self.board_simulations = board_simulations
+        self.shots_per_simulation = shots_per_simulation
     
     def analyze_hits(self):
         # Analiza el tablero para ajustar los tamaños de los barcos restantes
@@ -211,9 +213,9 @@ class MonteCarloPlayer(Player):
             # No se encontraron hits en ninguna simulación
             return np.random.randint(10), np.random.randint(10)
         
-    def determine_best_move(self, simulations=100, shots_per_simulation=100):
+    def determine_best_move(self):
         """Determina el mejor movimiento basado en múltiples simulaciones."""
-        best_move = self.multiple_board_simulations(simulations, shots_per_simulation)
+        best_move = self.multiple_board_simulations(self.board_simulations, self.shots_per_simulation)
         return best_move
 
 class Game:
@@ -222,10 +224,12 @@ class Game:
     Class Game, allows to create a game with 2 players
     '''
 
-    def __init__(self, AI = False):
+    def __init__(self, AI = False, boards = None, shots = None):
         self.AI = AI #If the game is played against the AI
+        self.boards = boards
+        self.shots = shots
         self.player_1 = Player() #Player 1 with 10 ships
-        self.player_2 = Player() if not AI else MonteCarloPlayer()
+        self.player_2 = Player() if not AI else MonteCarloPlayer(board_simulations=boards, shots_per_simulation=shots)
         self.player_1_turn = True #Player 1 starts
         self.over = False #Game is not over
         self.player_1_removed_positions = [] #List of removed positions of player 1

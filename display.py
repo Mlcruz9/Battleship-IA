@@ -65,7 +65,7 @@ def draw_shots(game_shots, left, top):
 #Loop of the game
 animating = True
 pausing = False
-Game_battleship = Game(AI=True) #Create an object of the class Game
+Game_battleship = Game(AI=False) #Create an object of the class Game
 
 #Grids
 SCREEN.fill(GREY)
