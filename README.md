@@ -1,6 +1,6 @@
 # 🚢 Battleship IA
 
-![Descripción del GIF](./img/created_gif.gif)
+<img src="./img/created_gif.gif" width="500" height="500">
 
 Welcome to **Battleship IA**, an interactive battleship game designed with Python. Utilizing numpy for mathematical operations and the Pygame framework for game interactions, this game is structured exclusively for AI vs. AI gameplay. Due to time constraints during development, the ability for human players to participate has not been implemented.
 
