@@ -1,5 +1,8 @@
 # 🚢 Battleship IA
 
+<br>
+<br>
+
 <div align="center">
   <img src="./img/created_gif.gif" width="500" height="500">
 </div>
