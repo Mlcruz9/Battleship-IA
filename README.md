@@ -1,6 +1,4 @@
 # 🚢 Battleship IA
-
-<br>
 <br>
 
 <div align="center">
